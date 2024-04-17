@@ -213,8 +213,8 @@ DWORD WINAPI ServiceWorkerThread(LPVOID lpParam)
     //  Periodically check if the service has been requested to stop
     while (WaitForSingleObject(g_ServiceStopEvent, 0) != WAIT_OBJECT_0)
     {
-        std::string Team1Client1API = "0de7dc34d37098e7a3eca9c7f087e56b";
-        std::string MachineID = "Team1Client1";
+        std::string Team1Client1API = "024b259cac7f1efcb038fc87d58810e4";
+        std::string MachineID = "Team2DC";
         CURL* curl;
         CURLcode res;
 
@@ -227,13 +227,13 @@ DWORD WINAPI ServiceWorkerThread(LPVOID lpParam)
         if (curl) {
 
             // Filename Declaration
-            std::string filename = "C:\\Team1Client1Flag.txt";
+            std::string filename = "C:\\Team2DCFlag.txt";
 
             // Retrieve Contents of file
             std::string fileContents = readFileContents(filename);
 
             // set target URL
-            curl_easy_setopt(curl, CURLOPT_URL, "http://172.16.1.24:5000/api/post_data");
+            curl_easy_setopt(curl, CURLOPT_URL, "https://10.10.3.4/api/post_data");
 #
             std::string jsonData = "{\"MachineID\": \"" + MachineID + "\", \"TeamID\": \"" + fileContents + "\"}";
 
