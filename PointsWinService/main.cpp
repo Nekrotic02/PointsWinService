@@ -234,7 +234,7 @@ DWORD WINAPI ServiceWorkerThread(LPVOID lpParam)
 
             // set target URL
             curl_easy_setopt(curl, CURLOPT_URL, "https://10.10.3.4/api/post_data");
-#
+
             std::string jsonData = "{\"MachineID\": \"" + MachineID + "\", \"TeamID\": \"" + fileContents + "\"}";
 
             // Specify the POST data
