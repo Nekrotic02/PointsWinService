@@ -209,7 +209,6 @@ VOID WINAPI ServiceCtrlHandler(DWORD CtrlCode)
 DWORD WINAPI ServiceWorkerThread(LPVOID lpParam)
 {
     OutputDebugString(_T("PointService: ServiceWorkerThread: Entry"));
-    int i = 0;
     //  Periodically check if the service has been requested to stop
     while (WaitForSingleObject(g_ServiceStopEvent, 0) != WAIT_OBJECT_0)
     {
@@ -227,13 +226,13 @@ DWORD WINAPI ServiceWorkerThread(LPVOID lpParam)
         if (curl) {
 
             // Filename Declaration
-            std::string filename = "C:\\Team2DCFlag.txt";
+            std::string filename = "C:\\King.txt";
 
             // Retrieve Contents of file
             std::string fileContents = readFileContents(filename);
 
             // set target URL
-            curl_easy_setopt(curl, CURLOPT_URL, "https://10.10.3.4/api/post_data");
+            curl_easy_setopt(curl, CURLOPT_URL, "https://192.168.88.140/api/post_data");
 
             std::string jsonData = "{\"MachineID\": \"" + MachineID + "\", \"TeamID\": \"" + fileContents + "\"}";
 
@@ -257,7 +256,6 @@ DWORD WINAPI ServiceWorkerThread(LPVOID lpParam)
         }
         curl_global_cleanup();
         Sleep(5000);
-        i++;
     }
 
     OutputDebugString(_T("PointService: ServiceWorkerThread: Exit"));
