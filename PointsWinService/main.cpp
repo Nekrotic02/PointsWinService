@@ -6,6 +6,11 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <cstring>
+#include <cerrno>
+#include <filesystem>
+
+namespace fs = std::filesystem; 
 
 SERVICE_STATUS        g_ServiceStatus = { 0 };
 SERVICE_STATUS_HANDLE g_StatusHandle = NULL;
@@ -21,6 +26,7 @@ std::string readFileContents(const std::string& filename)
 {
     std::ifstream file(filename);
     std::string contents;
+    std::string line;
 
     if (file.is_open())
     {
@@ -33,7 +39,13 @@ std::string readFileContents(const std::string& filename)
     }
     else
     {
-        std::cerr << "Unable to open file: " << filename << std::endl;
+        std::ofstream logfile("C:\\PointService\\log.txt", std::ios_base::app);
+        if (logfile.is_open())
+        {
+            logfile << "Cannot Open File: " << filename << std::endl;
+            logfile << "Erorr: " << strerror(errno) << std::endl; 
+            logfile.close();
+        }
     }
     // Remove the trailing newline character, if present
     if (!contents.empty() && contents.back() == '\n') {
@@ -212,10 +224,12 @@ DWORD WINAPI ServiceWorkerThread(LPVOID lpParam)
     //  Periodically check if the service has been requested to stop
     while (WaitForSingleObject(g_ServiceStopEvent, 0) != WAIT_OBJECT_0)
     {
-        std::string Team1Client1API = "024b259cac7f1efcb038fc87d58810e4";
-        std::string MachineID = "Team2DC";
+        std::string Team1Client1API = "0de7dc34d37098e7a3eca9c7f087e56b";
+        std::string MachineID = "Team1Client1";
         CURL* curl;
         CURLcode res;
+        std::ofstream logfile("C:\\PointService\\log.txt", std::ios_base::app);
+
 
         // Initial winsock
         curl_global_init(CURL_GLOBAL_ALL);
@@ -228,11 +242,36 @@ DWORD WINAPI ServiceWorkerThread(LPVOID lpParam)
             // Filename Declaration
             std::string filename = "C:\\King.txt";
 
+            if (!fs::exists(filename))
+            {
+                std::ofstream outfile(filename);
+
+                if (!outfile.is_open())
+                {
+                    if (logfile.is_open())
+                    {
+                        logfile << "Error Creating File " << filename << std::endl;
+                        logfile.close();
+                    }
+                }
+
+                outfile.close();
+            }
             // Retrieve Contents of file
             std::string fileContents = readFileContents(filename);
 
+            if (logfile.is_open())
+            {
+                logfile << "Filename: " << filename << std::endl;
+                logfile << "File Contents: " << fileContents << std::endl;
+                logfile.close();
+            }
+
             // set target URL
-            curl_easy_setopt(curl, CURLOPT_URL, "https://192.168.88.140/api/post_data");
+            curl_easy_setopt(curl, CURLOPT_URL, "https://pointserv.local/api/post_data");
+
+            /* Set the value of verification to null */
+            curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
 
             std::string jsonData = "{\"MachineID\": \"" + MachineID + "\", \"TeamID\": \"" + fileContents + "\"}";
 
